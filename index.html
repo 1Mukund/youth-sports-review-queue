@@ -3,19 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
 <title>Roster Review Queue</title>
 <style>
-  :root{
-    --bg:#f6f7f9; --card:#fff; --ink:#15181d; --muted:#697086; --line:#e3e6ec;
-    --accent:#1f6feb; --warn:#b54708; --warnbg:#fffaeb; --ok:#067647; --okbg:#ecfdf3;
-    --bad:#b42318; --badbg:#fef3f2; --radius:14px;
-  }
-  @media (prefers-color-scheme:dark){
-    :root:not([data-theme="light"]){
-      --bg:#0f1115; --card:#171a21; --ink:#e9ecf1; --muted:#9aa3b8; --line:#272c37;
-      --accent:#5b9bff; --warnbg:#2a2113; --okbg:#10241a; --badbg:#2a1616;
-    }
-  }
+  :root{--bg:#f6f7f9;--card:#fff;--ink:#15181d;--muted:#697086;--line:#e3e6ec;
+    --accent:#1f6feb;--warn:#b54708;--warnbg:#fffaeb;--ok:#067647;--okbg:#ecfdf3;
+    --bad:#b42318;--badbg:#fef3f2;--radius:14px}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --bg:#0f1115;--card:#171a21;--ink:#e9ecf1;--muted:#9aa3b8;--line:#272c37;
+    --accent:#5b9bff;--warnbg:#2a2113;--okbg:#10241a;--badbg:#2a1616}}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);
     font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
@@ -30,218 +29,119 @@
     padding:16px;margin-bottom:12px}
   .row{display:flex;gap:14px;align-items:flex-start}
   .frame{flex:0 0 96px;height:96px;border-radius:10px;overflow:hidden;border:1px solid var(--line);
-    background:linear-gradient(160deg,#2c3340,#171a21);display:grid;place-items:center;position:relative}
+    background:linear-gradient(160deg,#2c3340,#171a21);display:grid;place-items:center}
   .frame svg{width:100%;height:100%}
   .meta{flex:1;min-width:0}
   .meta h3{margin:0 0 3px;font-size:15.5px}
   .meta p{margin:0;color:var(--muted);font-size:13.5px}
-  .conf{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:12.5px;
-    color:var(--warn);background:var(--warnbg);padding:3px 9px;border-radius:999px;font-weight:600}
+  .conf{display:inline-flex;gap:6px;margin-top:8px;font-size:12.5px;color:var(--warn);
+    background:var(--warnbg);padding:3px 9px;border-radius:999px;font-weight:600}
   .why{margin-top:12px;padding:11px 13px;background:var(--bg);border:1px solid var(--line);
     border-radius:10px;font-size:13.5px;color:var(--muted)}
   .why b{color:var(--ink);font-weight:600}
   .choices{margin-top:14px}
-  .choices .lab{font-size:12.5px;color:var(--muted);text-transform:uppercase;
-    letter-spacing:.05em;font-weight:600;margin-bottom:8px}
+  .lab{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;
+    font-weight:600;margin-bottom:8px}
   .opt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;
     background:var(--card);border:1.5px solid var(--line);border-radius:10px;
     padding:11px 13px;margin-bottom:7px;color:var(--ink);font-size:14.5px;font-family:inherit}
-  .opt:hover{border-color:var(--accent)}
+  .opt:hover,.opt:focus-visible{border-color:var(--accent);outline:none}
   .opt .num{flex:0 0 34px;height:34px;border-radius:8px;background:var(--bg);
     display:grid;place-items:center;font-weight:700;font-size:14px;border:1px solid var(--line)}
   .opt .guess{margin-left:auto;font-size:11.5px;color:var(--muted);font-weight:600}
   .actions{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
-  button.btn{flex:1;min-width:130px;padding:11px 14px;border-radius:10px;cursor:pointer;
+  .btn{flex:1;min-width:130px;padding:11px 14px;border-radius:10px;cursor:pointer;
     font-size:14.5px;font-weight:600;font-family:inherit;border:1.5px solid var(--line);
     background:var(--card);color:var(--ink)}
-  button.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-  button.btn.ghost{color:var(--muted)}
-  button.btn:hover{filter:brightness(.97)}
-  .done{text-align:center;padding:34px 18px}
-  .done .tick{width:52px;height:52px;border-radius:50%;background:var(--okbg);color:var(--ok);
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.ghost{color:var(--muted)}
+  .done{text-align:center;padding:30px 18px}
+  .done h3{margin:0 0 6px}
+  .done .sub{color:var(--muted);margin:0 0 16px}
+  .tick{width:52px;height:52px;border-radius:50%;background:var(--okbg);color:var(--ok);
     display:grid;place-items:center;margin:0 auto 14px;font-size:26px;border:1px solid var(--line)}
+  .recap{background:var(--okbg);border:1px solid var(--line);border-radius:10px;
+    padding:13px;font-size:13.5px;text-align:left}
+  .recap.warnbox{background:var(--warnbg)}
+  .recap b,.notif b{display:block;margin-bottom:4px;color:var(--ink)}
+  .notif{background:var(--bg);border:1px solid var(--line);border-radius:10px;
+    padding:13px;font-size:13.5px;text-align:left;margin-top:10px;color:var(--muted)}
   .log{margin-top:18px}
   .log h4{font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);
     margin:0 0 9px;font-weight:600}
   .logitem{display:flex;gap:9px;align-items:baseline;font-size:13.5px;padding:8px 0;
     border-bottom:1px solid var(--line);color:var(--muted)}
   .logitem:last-child{border-bottom:0}
+  .logitem b{color:var(--ink)}
+  .logitem.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px}
   .tag{flex:0 0 auto;font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;
-    text-transform:uppercase;letter-spacing:.03em}
+    text-transform:uppercase}
   .tag.ok{background:var(--okbg);color:var(--ok)}
   .tag.fix{background:var(--warnbg);color:var(--warn)}
   .tag.drop{background:var(--badbg);color:var(--bad)}
   .tag.held{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
-  .note{font-size:12.5px;color:var(--muted);margin-top:22px;padding-top:16px;
-    border-top:1px solid var(--line)}
-  .note a{color:var(--accent)}
+  .safe{margin-top:18px;background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:16px}
+  .safe ul{margin:0;padding-left:18px;color:var(--muted);font-size:13.5px}
+  .safe li{margin-bottom:7px}
+  .safe li b{color:var(--ink);font-weight:600}
   .bar{display:flex;gap:7px;margin-bottom:16px}
   .seg{flex:1;height:3px;border-radius:2px;background:var(--line)}
   .seg.on{background:var(--accent)}
-  .recap{background:var(--okbg);border:1px solid var(--line);border-radius:10px;
-    padding:13px;font-size:13.5px;margin-top:6px}
-  .recap.warnbox{background:var(--warnbg)}
-  .recap b{display:block;margin-bottom:4px;color:var(--ink)}
+  .note{font-size:12.5px;color:var(--muted);margin-top:22px;padding-top:16px;
+    border-top:1px solid var(--line)}
+  .note a{color:var(--accent)}
 </style>
 </head>
 <body>
 <div class="wrap">
-
 <header>
   <div class="brand">Roster Review Queue
-    <small>SidelineReel, coach view. Sample data from this week's tickets.</small></div>
+    <small>SidelineReel, coach view. Sample data from this week&rsquo;s tickets.</small></div>
   <div class="pill" id="count">3 clips need review</div>
 </header>
 
 <div class="bar" id="bar"></div>
-<div id="app"></div>
+<main id="app"></main>
 
 <div class="log" id="logwrap" style="display:none">
   <h4>What the weekly recap will send</h4>
   <div id="log"></div>
 </div>
 
+<div class="log" id="auditwrap" style="display:none">
+  <h4>Audit trail</h4>
+  <div id="audit"></div>
+</div>
+
+<section class="safe">
+  <div class="lab">Safeguards this flow enforces</div>
+  <ul>
+    <li><b>Fails closed.</b> An unreviewed clip is never published. Nothing goes out unchecked,
+      even if that means a child gets no reel this week.</li>
+    <li><b>No child name leaves the system.</b> The notification says "your child&rsquo;s reel",
+      never a name, number or thumbnail. The reel opens only behind that family&rsquo;s login.</li>
+    <li><b>A coach sees one roster.</b> Review is scoped to their own team, so resolving a
+      collision never exposes another club&rsquo;s children.</li>
+    <li><b>Every decision is attributed.</b> Confirm, reassign and discard are written to an
+      audit trail with who and when, because reassignment moves a child&rsquo;s footage.</li>
+    <li><b>Discarded footage is deleted, not orphaned.</b> A clip matching no roster player is
+      queued for deletion rather than sitting unlinked in storage.</li>
+    <li><b>Page hardening.</b> Content Security Policy blocks all external and inline scripts,
+      no referrer is sent, all rendered values are escaped, and the page loads no third party
+      code, fonts or trackers.</li>
+  </ul>
+</section>
+
 <div class="note">
   Prototype for the Ajaia Product Manager assessment. Built by Balmukund Tripathi.
-  Company: <a href="https://ajaia.ai">ajaia.ai</a>.
-  Names and clips are sample data. The three jersey collisions are the ones described in the
-  support tickets: 14 against 4, 1 against 11, and a swapped-digit pair.
+  Company: <a href="https://ajaia.ai" rel="noopener noreferrer">ajaia.ai</a>.
+  Names and clips are sample data, not real children. The three jersey collisions are the ones
+  described in the support tickets: 14 against 4, 1 against 11, and a swapped-digit pair.
+  Assumption, flagged: a US product filming under-13s falls under COPPA, so the safeguards above
+  are written as product requirements rather than nice to have.
 </div>
-
 </div>
-
-<script>
-// Each clip is one the tagger could not resolve safely, because the number it read
-// has a look-alike that is ALSO on this team's roster. Clips with no roster collision
-// never reach this queue.
-const CLIPS = [
-  { id:1, club:"Ridgeline Youth Soccer", read:"4", conf:0.61,
-    reason:"Read 4. This roster also has a 14, and the first digit was blocked by another player at the moment of the shot.",
-    candidates:[ {num:"4", name:"Priya Raman", guess:true}, {num:"14", name:"Maya Chen"} ] },
-  { id:2, club:"Cobblestone Little League", read:"11", conf:0.58,
-    reason:"Read 11. This roster also has a 1. The jersey was side-on, so a single digit can read as a double.",
-    candidates:[ {num:"11", name:"Daniel Okafor", guess:true}, {num:"1", name:"Sam Whitlock"} ] },
-  { id:3, club:"Brightwater Youth Lacrosse", read:"32", conf:0.55,
-    reason:"Read 32. This roster also has a 23. Same digits, reversed, and the player was turning away from the camera.",
-    candidates:[ {num:"32", name:"Ellis Barnes", guess:true}, {num:"23", name:"Tomas Reyes"} ] }
-];
-
-let i = 0;
-const decisions = [];
-
-const jersey = n => `<svg viewBox="0 0 80 80"><rect width="80" height="80" fill="none"/>
-  <path d="M26 16 L40 22 L54 16 L64 26 L57 34 L57 66 L23 66 L23 34 L16 26 Z"
-    fill="#3a4351" stroke="#525c6e" stroke-width="1.5"/>
-  <text x="40" y="54" font-size="26" font-weight="700" fill="#e9ecf1"
-    text-anchor="middle" font-family="system-ui" opacity="0.92">${n}</text></svg>`;
-
-function bar(){
-  document.getElementById('bar').innerHTML =
-    CLIPS.map((_,k)=>`<div class="seg ${k<=i?'on':''}"></div>`).join('');
-}
-
-function render(){
-  bar();
-  const app = document.getElementById('app');
-  const left = CLIPS.length - i;
-  document.getElementById('count').textContent =
-    left === 0 ? "Queue clear" : left + (left===1?" clip needs review":" clips need review");
-
-  if (i >= CLIPS.length){ return finish(); }
-
-  const c = CLIPS[i];
-  app.innerHTML = `
-    <div class="card">
-      <div class="row">
-        <div class="frame">${jersey(c.read)}</div>
-        <div class="meta">
-          <h3>${c.club}</h3>
-          <p>Clip ${c.id} of ${CLIPS.length}. Held before publishing.</p>
-          <span class="conf">Not confident enough to send on its own</span>
-        </div>
-      </div>
-
-      <div class="why"><b>Why this stopped:</b> ${c.reason}</div>
-
-      <div class="choices">
-        <div class="lab">Who is this?</div>
-        ${c.candidates.map((p,k)=>`
-          <button class="opt" onclick="pick(${k})">
-            <span class="num">${p.num}</span>
-            <span>${p.name}</span>
-            ${p.guess?'<span class="guess">SYSTEM GUESS</span>':''}
-          </button>`).join('')}
-      </div>
-
-      <div class="actions">
-        <button class="btn ghost" onclick="discard()">Not our player</button>
-        <button class="btn ghost" onclick="skip()">Skip for now</button>
-      </div>
-    </div>`;
-}
-
-function pick(k){
-  const c = CLIPS[i], p = c.candidates[k];
-  decisions.push({ club:c.club,
-    tag: p.guess ? 'ok' : 'fix',
-    text: p.guess
-      ? `Confirmed. Clip goes to ${p.name}, number ${p.num}.`
-      : `Corrected. Clip moved off number ${c.read} and sent to ${p.name}, number ${p.num}.` });
-  i++; render();
-}
-function discard(){
-  decisions.push({ club:CLIPS[i].club, tag:'drop',
-    text:'Discarded. Not a player on this roster, so it is in nobody’s reel.' });
-  i++; render();
-}
-function skip(){
-  decisions.push({ club:CLIPS[i].club, tag:'held',
-    text:'Left for later. It stays held, so it does not go out in this week’s recap.' });
-  i++; render();
-}
-
-function finish(){
-  const held = decisions.filter(d=>d.tag==='held').length;
-  const fixed = decisions.filter(d=>d.tag==='fix').length;
-  document.getElementById('app').innerHTML = `
-    <div class="card done">
-      <div class="tick">&#10003;</div>
-      <h3 style="margin:0 0 6px">Queue clear</h3>
-      <p style="color:var(--muted);margin:0 0 16px">
-        ${fixed>0 ? fixed + (fixed===1?' clip was':' clips were') + ' going to the wrong child and will not now.'
-                  : 'Nothing was heading to the wrong child this week.'}
-      </p>
-      <div class="recap ${held>0?'warnbox':''}">
-        <b>${held>0?'Recap sends with a gap':'Recap sends complete'}</b>
-        ${held>0
-          ? held + (held===1?' clip is':' clips are') + ' still held, so ' +
-            (held===1?'it stays':'they stay') + ' out of this week’s recap rather than going out unchecked. '+
-            'Any child left with no clips at all gets no reel this week, and you get told which.'
-          : 'Every held clip was resolved before the weekly recap assembles.'}
-      </div>
-      <div class="actions" style="margin-top:14px">
-        <button class="btn primary" onclick="reset()">Run it again</button>
-      </div>
-    </div>`;
-  showLog();
-}
-
-function showLog(){
-  document.getElementById('logwrap').style.display='block';
-  document.getElementById('log').innerHTML = decisions.map(d=>`
-    <div class="logitem">
-      <span class="tag ${d.tag}">${d.tag==='ok'?'sent':d.tag==='fix'?'fixed':d.tag==='drop'?'dropped':'held'}</span>
-      <span><b style="color:var(--ink)">${d.club}.</b> ${d.text}</span>
-    </div>`).join('');
-}
-
-function reset(){
-  i=0; decisions.length=0;
-  document.getElementById('logwrap').style.display='none';
-  render();
-}
-
-render();
-</script>
+<script src="app.js"></script>
 </body>
 </html>
