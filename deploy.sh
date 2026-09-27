@@ -7,5 +7,5 @@ git commit -q -m "${1:-Update prototype}" || echo "(nothing new to commit)"
 git push -q origin master
 echo "Pushed. Waiting for GitHub Pages to rebuild..."
 sleep 10
-until [ "$(curl -s -o /dev/null -w '%{http_code}' https://1mukund.github.io/sidelinereel-prototype/)" = "200" ]; do sleep 5; done
-echo "LIVE: https://1mukund.github.io/sidelinereel-prototype/"
+until [ "$(curl -s -o /dev/null -w '%{http_code}' https://1mukund.github.io/youth-sports-review-queue/)" = "200" ]; do sleep 5; done
+echo "LIVE: https://1mukund.github.io/youth-sports-review-queue/"

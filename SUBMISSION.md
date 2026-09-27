@@ -3,8 +3,8 @@
 
 **Video:** <PASTE VIDEO LINK HERE - must be first>
 
-**Prototype (live, runs in browser):** https://1mukund.github.io/sidelinereel-prototype/
-**Prototype source:** https://github.com/1Mukund/sidelinereel-prototype
+**Prototype (live, runs in browser):** https://1mukund.github.io/youth-sports-review-queue/
+**Prototype source:** https://github.com/1Mukund/youth-sports-review-queue
 **Resume:** https://drive.google.com/file/d/1D69YJCRDbr5ugYpp68tIQrGhcGC2Rv2K/view?usp=sharing
 
 ---
